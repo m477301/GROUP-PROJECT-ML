@@ -15,3 +15,8 @@
   - Logistic Regression
 - Accuracy of Models/Results
 - Summary
+
+# Setup 
+
+pip install beautifulsoup4
+pip install requests
