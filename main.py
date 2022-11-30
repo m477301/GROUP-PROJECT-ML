@@ -6,8 +6,9 @@ import re
 data = open('data.json')
 books = json.load(data)
 data.close()
-
-for i in range(1, 10):
+start = 1
+finish = 10
+for i in range(start, finish):
     url = f"https://www.goodreads.com/book/show/{i}"
 
     result = requests.get(url)
@@ -94,6 +95,8 @@ for i in range(1, 10):
     }
 
     books.append(book)
+
+    print(f"Completed: {(i/finish)*100}%")
 
 jsonString = json.dumps(books)
 jsonFile = open("data.json", "w")
