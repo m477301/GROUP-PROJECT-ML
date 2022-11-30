@@ -3,11 +3,11 @@ import requests
 import json
 import re
 
-data = open('data.json')
+data = open('data.json', encoding="utf8")
 books = json.load(data)
 data.close()
 start = 1
-finish = 10
+finish = 50
 for i in range(start, finish):
     url = f"https://www.goodreads.com/book/show/{i}"
 
@@ -24,7 +24,10 @@ for i in range(start, finish):
     if html:
         # Get the title
         h1Title = doc.find(id="bookTitle")
-        title = str(h1Title.text.strip())
+        if h1Title:
+            title = str(h1Title.text.strip())
+        else:
+            continue
 
         # Get the blurb
         blurbClass = doc.find(class_="readable stacked")
@@ -51,14 +54,13 @@ for i in range(start, finish):
             pages = str(PageCount.contents[0].text.strip()).split(" ")[0]
         else:
             pages = None    
-
-        # Get publishing date
-        PublishingDate = doc.find(class_="row")
-        date = str(PublishingDate.contents[1].text.strip())
     else: 
         # Get the title
         h1Title = doc.find(class_="Text Text__title1")
-        title = str(h1Title.text.strip())
+        if h1Title:
+            title = str(h1Title.text.strip())
+        else:
+            continue
 
         # Get the blurb
         blurbClass = doc.find(class_="Formatted")
@@ -79,10 +81,9 @@ for i in range(start, finish):
         bookRating = doc.find(class_="RatingStatistics__rating")
         rating = str(bookRating.text.strip())
 
-        # Get pages & format and publishing date
+        # Get pages & format
         extraInfo = doc.find(class_='FeaturedDetails')
         pages = str(extraInfo.contents[0].text.strip()).split(" ")[0]
-        date = str(extraInfo.contents[1].text.strip()).split(" ")[-1]
 
     book = {
         "title": title,
@@ -90,8 +91,7 @@ for i in range(start, finish):
         "genre": genres,
         "author": author,
         "rating": rating,
-        "pages": pages,
-        "date": date
+        "pages": pages
     }
 
     books.append(book)
