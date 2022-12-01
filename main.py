@@ -131,7 +131,7 @@ for i in range(start, finish):
     }
 
     logging.basicConfig(filename='app.log', filemode='w+', format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    logging.info("Added " + str(book) + " to Data.")
+    logging.info("Added Book(" + i + ") to Data.")
 
     books.append(book)
     jsonString = json.dumps(books)
