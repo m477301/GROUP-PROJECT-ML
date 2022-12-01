@@ -36,23 +36,35 @@ for i in range(start, finish):
 
         # Get the blurb
         blurbClass = doc.find(class_="readable stacked")
-        blurb = str(blurbClass.text.strip())
-        blurb = blurb.translate({ord(i): None for i in '"'})
+        if blurbClass:
+            blurb = str(blurbClass.text.strip())
+            blurb = blurb.translate({ord(i): None for i in '"'})
+        else:
+            continue
 
         # Get the genres
         actionLinkGenres = doc.find_all(class_="actionLinkLite bookPageGenreLink") 
-        genres = []
-        for genre in actionLinkGenres:
-            if str(genre.text.strip()) != "...more":
-                genres.append(str(genre.text.strip()))
+        if actionLinkGenres:
+            genres = []
+            for genre in actionLinkGenres:
+                if str(genre.text.strip()) != "...more":
+                    genres.append(str(genre.text.strip()))
+        else:
+            continue
         
         # Get author
         authorName = doc.find(class_="authorName")
-        author = str(authorName.text.strip())
+        if authorName:
+            author = str(authorName.text.strip())
+        else:
+            author = None
 
         # Get book rating
         bookRating = doc.find("span", itemprop="ratingValue")
-        rating = str(bookRating.text.strip())
+        if bookRating:
+            rating = str(bookRating.text.strip())
+        else:
+            rating = None
 
         # Get pages & format
         PageCount = doc.find("span", itemprop='numberOfPages')
@@ -70,27 +82,42 @@ for i in range(start, finish):
 
         # Get the blurb
         blurbClass = doc.find(class_="Formatted")
-        blurb = str(blurbClass.text.strip())
-        blurb = blurb.translate({ord(i): None for i in '"'})
+        if blurbClass:
+            blurb = str(blurbClass.text.strip())
+            blurb = blurb.translate({ord(i): None for i in '"'})
+        else:
+            continue
         
         # Get the genres of the book
         actionLinkGenres = doc.find_all(class_="Button Button--tag-inline Button--small") 
-        genres = []
-        for genre in actionLinkGenres:
-            if str(genre.text.strip()) != "...more":
-                genres.append(str(genre.text.strip()))
+        if actionLinkGenres:
+            genres = []
+            for genre in actionLinkGenres:
+                if str(genre.text.strip()) != "...more":
+                    genres.append(str(genre.text.strip()))
+        else:
+            continue
         
         # Get author
         authorName = doc.find(class_="ContributorLink__name")
-        author = str(authorName.text.strip())
+        if authorName:
+            author = str(authorName.text.strip())
+        else:
+            author = None
 
         # Get book rating
         bookRating = doc.find(class_="RatingStatistics__rating")
-        rating = str(bookRating.text.strip())
+        if bookRating:
+            rating = str(bookRating.text.strip())
+        else:
+            rating = None
 
         # Get pages & format
         extraInfo = doc.find(class_='FeaturedDetails')
-        pages = str(extraInfo.contents[0].text.strip()).split(" ")[0]
+        if extraInfo:
+            pages = str(extraInfo.contents[0].text.strip()).split(" ")[0]
+        else:
+            pages = None
 
     book = {
         "id": i,
@@ -109,3 +136,4 @@ for i in range(start, finish):
     jsonFile.close()
 
     print(f"Completed: {(i/finish)*100}%")
+print(f"Current Number of Datapoints: {len(books)}")
