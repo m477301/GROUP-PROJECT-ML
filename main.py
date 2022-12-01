@@ -7,8 +7,8 @@ data = open('data.json', encoding="utf8")
 books = json.load(data)
 data.close()
 
-start = 1
-finish = 50
+start = 5000
+finish = 10000
 for i in range(start, finish):
     if books:
         if any(d['id'] == i for d in books):
