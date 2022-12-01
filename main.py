@@ -2,7 +2,9 @@ from bs4 import BeautifulSoup
 import requests 
 import json
 import re
+import logging
 
+<<<<<<< HEAD
 books = []
 jsonString = json.dumps(books)
 jsonFile = open("data1.json", "w")
@@ -11,6 +13,14 @@ jsonFile.close()
 
 start = 20001
 finish = 40000
+=======
+data = open('data.json', encoding="utf8")
+books = json.load(data)
+data.close()
+
+start = 1
+finish = 20000
+>>>>>>> 5e3b463bd6eaa3cbddfc6c03d52fb264bea1811d
 for i in range(start, finish):
     if books:
         if any(d['id'] == i for d in books):
@@ -130,6 +140,9 @@ for i in range(start, finish):
         "rating": rating,
         "pages": pages
     }
+
+    logging.basicConfig(filename='app.log', filemode='w+', format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+    logging.info("Added Book(" + i + ") to Data.")
 
     books.append(book)
     jsonString = json.dumps(books)
