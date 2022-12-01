@@ -5,9 +5,21 @@ import re
 import logging
 import sys
 
-# data = open('data1.json', encoding="utf8")
+# Combining JSON
+# ---------------
+# data = open('data.json', encoding="utf8")
 # books = json.load(data)
 # data.close()
+# data = open('data9.json', encoding="utf8")
+# books_two = json.load(data)
+# for book in books_two:
+#     books.append(book)
+
+# jsonString = json.dumps(books)
+# jsonFile = open("data.json", "w")
+# jsonFile.write(jsonString)
+# jsonFile.close()
+# print(len(books))
 
 books = []
 jsonString = json.dumps(books)
