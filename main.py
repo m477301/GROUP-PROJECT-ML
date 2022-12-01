@@ -4,23 +4,12 @@ import json
 import re
 import logging
 
-<<<<<<< HEAD
-books = []
-jsonString = json.dumps(books)
-jsonFile = open("data1.json", "w")
-jsonFile.write(jsonString)
-jsonFile.close()
-
-start = 20001
-finish = 40000
-=======
 data = open('data.json', encoding="utf8")
 books = json.load(data)
 data.close()
 
 start = 1
-finish = 20000
->>>>>>> 5e3b463bd6eaa3cbddfc6c03d52fb264bea1811d
+finish = 1
 for i in range(start, finish):
     if books:
         if any(d['id'] == i for d in books):
@@ -146,7 +135,7 @@ for i in range(start, finish):
 
     books.append(book)
     jsonString = json.dumps(books)
-    jsonFile = open("data1.json", "w")
+    jsonFile = open("data.json", "w")
     jsonFile.write(jsonString)
     jsonFile.close()
 
