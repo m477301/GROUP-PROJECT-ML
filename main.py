@@ -3,9 +3,17 @@ import requests
 import json
 import re
 
+data = open('data.json', encoding="utf8")
+books = json.load(data)
+data.close()
+
 start = 1
 finish = 50
 for i in range(start, finish):
+    if books:
+        if any(d['id'] == i for d in books):
+            continue
+                
     url = f"https://www.goodreads.com/book/show/{i}"
 
     result = requests.get(url)
@@ -94,9 +102,6 @@ for i in range(start, finish):
         "pages": pages
     }
 
-    data = open('data.json', encoding="utf8")
-    books = json.load(data)
-    data.close()
     books.append(book)
     jsonString = json.dumps(books)
     jsonFile = open("data.json", "w")
