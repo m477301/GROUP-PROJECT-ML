@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests 
 import json
 import re
+import logging
 
 data = open('data.json', encoding="utf8")
 books = json.load(data)
@@ -128,6 +129,9 @@ for i in range(start, finish):
         "rating": rating,
         "pages": pages
     }
+
+    logging.basicConfig(filename='app.log', filemode='w+', format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+    logging.info("Added " + str(book) + " to Data.")
 
     books.append(book)
     jsonString = json.dumps(books)
