@@ -3,9 +3,6 @@ import requests
 import json
 import re
 
-data = open('data.json', encoding="utf8")
-books = json.load(data)
-data.close()
 start = 1
 finish = 50
 for i in range(start, finish):
@@ -38,7 +35,8 @@ for i in range(start, finish):
         actionLinkGenres = doc.find_all(class_="actionLinkLite bookPageGenreLink") 
         genres = []
         for genre in actionLinkGenres:
-            genres.append(str(genre.text.strip()))
+            if str(genre.text.strip()) != "...more":
+                genres.append(str(genre.text.strip()))
         
         # Get author
         authorName = doc.find(class_="authorName")
@@ -71,7 +69,8 @@ for i in range(start, finish):
         actionLinkGenres = doc.find_all(class_="Button Button--tag-inline Button--small") 
         genres = []
         for genre in actionLinkGenres:
-            genres.append(str(genre.text.strip()))
+            if str(genre.text.strip()) != "...more":
+                genres.append(str(genre.text.strip()))
         
         # Get author
         authorName = doc.find(class_="ContributorLink__name")
@@ -86,6 +85,7 @@ for i in range(start, finish):
         pages = str(extraInfo.contents[0].text.strip()).split(" ")[0]
 
     book = {
+        "id": i,
         "title": title,
         "blurb": blurb,
         "genre": genres,
@@ -94,19 +94,13 @@ for i in range(start, finish):
         "pages": pages
     }
 
+    data = open('data.json', encoding="utf8")
+    books = json.load(data)
+    data.close()
     books.append(book)
+    jsonString = json.dumps(books)
+    jsonFile = open("data.json", "w")
+    jsonFile.write(jsonString)
+    jsonFile.close()
 
     print(f"Completed: {(i/finish)*100}%")
-
-jsonString = json.dumps(books)
-jsonFile = open("data.json", "w")
-jsonFile.write(jsonString)
-jsonFile.close()
-
-# SAMPLE JSON:
-
-# {
-# title: title_name
-#   
-# }
-
