@@ -7,7 +7,7 @@ data = open('data.json', encoding="utf8")
 books = json.load(data)
 data.close()
 
-start = 5000
+start = 1
 finish = 10000
 for i in range(start, finish):
     if books:
@@ -135,5 +135,5 @@ for i in range(start, finish):
     jsonFile.write(jsonString)
     jsonFile.close()
 
-    print(f"Completed: {(i/finish)*100}%")
+    print(f"Completed: {((i+1-start)/finish)*100}%")
 print(f"Current Number of Datapoints: {len(books)}")
