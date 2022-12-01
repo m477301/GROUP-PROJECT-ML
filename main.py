@@ -3,13 +3,20 @@ import requests
 import json
 import re
 import logging
+import sys
 
-data = open('data.json', encoding="utf8")
-books = json.load(data)
-data.close()
+# data = open('data1.json', encoding="utf8")
+# books = json.load(data)
+# data.close()
 
-start = 1
-finish = 1
+books = []
+jsonString = json.dumps(books)
+jsonFile = open("data" + sys.argv[3] + ".json", "w")
+jsonFile.write(jsonString)
+jsonFile.close()
+
+start = int(sys.argv[1])
+finish = int(sys.argv[2])
 for i in range(start, finish):
     if books:
         if any(d['id'] == i for d in books):
@@ -131,11 +138,11 @@ for i in range(start, finish):
     }
 
     logging.basicConfig(filename='app.log', filemode='w+', format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    logging.info("Added Book(" + i + ") to Data.")
+    logging.info("Added Book(" + str(i) + ") to Data.")
 
     books.append(book)
     jsonString = json.dumps(books)
-    jsonFile = open("data.json", "w")
+    jsonFile = open("data" + sys.argv[3] + ".json", "w")
     jsonFile.write(jsonString)
     jsonFile.close()
 
