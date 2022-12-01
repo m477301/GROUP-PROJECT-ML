@@ -1,13 +1,8 @@
 from bs4 import BeautifulSoup
 import requests 
 import json
-import re
-
+import r)
 books = []
-jsonString = json.dumps(books)
-jsonFile = open("data1.json", "w")
-jsonFile.write(jsonString)
-jsonFile.close()
 
 start = 20001
 finish = 40000
