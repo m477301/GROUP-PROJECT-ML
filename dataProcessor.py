@@ -34,6 +34,14 @@ nltk.download('wordnet')
 df = pd.read_json("genreData.json")
 print(df.columns)
 
+
+def crossValidGraph(Ci_range, mean_error, std_error):
+    plt.errorbar(Ci_range, mean_error, yerr=std_error)
+    plt.xlabel('Ci')
+    plt.ylabel('Accuracy')
+    plt.show()
+
+
 # count vectoriser
 vectorizer = CountVectorizer(tokenizer=lambda x: x.split(","))
 
@@ -137,72 +145,103 @@ tfidf = TfidfVectorizer(max_df=0.8, max_features=10000)
 tfidf_X_train = tfidf.fit_transform(X_train.values.astype('U'))
 tfidf_X_test = tfidf.transform(X_test.values.astype('U'))
 
-logistic = LogisticRegression()
-# train logistic model
-logistic.fit(tfidf_X_train, y_train)
-# predict on test values
-y_pred_logistic = logistic.predict(tfidf_X_test)
+Ci_range = [0.1, 0.5, 1, 5, 10, 20, 50]
+mean_error = []
+std_error = []
+bestScoreLogistic = -5
+for Ci in Ci_range:
+    logistic = LogisticRegression(penalty="l2", C=Ci)
+    # train logistic model
+    logistic.fit(tfidf_X_train, y_train)
+    # predict on test values
+    y_pred_logistic = logistic.predict(tfidf_X_test)
+    scores = accuracy_score(y_test, y_pred_logistic)
+    if (scores > bestScoreLogistic):
+        print(scores)
+        mostAccurateModelLogistic = logistic
+        bestScoreLogistic = scores
+        best_y_pred = y_pred_logistic
+    mean_error.append(np.array(scores).mean())
+    std_error.append(np.array(scores).std())
+crossValidGraph(Ci_range, mean_error, std_error)
 
-# print('Accuracy score :', accuracy_score(y_test, y_pred_logistic))
-# print('Report : ')
-# print(classification_report(y_test, y_pred_logistic))
-# # print(len(y_pred_logistic))
+print('Accuracy score :', bestScoreLogistic)
+print('Report : ')
+print(classification_report(y_test, best_y_pred))
+# print(len(y_pred_logistic))
 
 # # KNN
 knn = KNeighborsClassifier(n_neighbors=65)
-# knn.fit(tfidf_X_train, y_train)
+knn.fit(tfidf_X_train, y_train)
 
-# y_pred_knn = knn.predict(tfidf_X_test)
-# print('Accuracy Score :', accuracy_score(y_test, y_pred_knn))
-# print('Report : ')
-# print(classification_report(y_test, y_pred_knn))
+y_pred_knn = knn.predict(tfidf_X_test)
+print('Accuracy Score :', accuracy_score(y_test, y_pred_knn))
+print('Report : ')
+print(classification_report(y_test, y_pred_knn))
 
-# # SVM Linear classifer
-# svc = svm.SVC(kernel='linear').fit(tfidf_X_train, y_train)
-# y_pred_svc = svc.predict(tfidf_X_test)
-# print('Accuracy Score :', accuracy_score(y_test, y_pred_svc))
-# print('Report : ')
-# print(classification_report(y_test, y_pred_svc))
+# SVM Linear classifer
+svc = svm.SVC(kernel='linear').fit(tfidf_X_train, y_train)
+y_pred_svc = svc.predict(tfidf_X_test)
+mean_error = []
+std_error = []
+bestScoreSVM = -5
+for Ci in Ci_range:
+    svc = svm.SVC(kernel='linear', C=Ci).fit(tfidf_X_train, y_train)
+    # train logistic model
+    # predict on test values
+    y_pred_svm = svc.predict(tfidf_X_test)
+    scores = accuracy_score(y_test, y_pred_svm)
+    if (scores > bestScoreSVM):
+        print(scores)
+        mostAccurateModelSVM = svc
+        bestScoreSVM = scores
+        best_y_pred = y_pred_svm
+    mean_error.append(np.array(scores).mean())
+    std_error.append(np.array(scores).std())
+crossValidGraph(Ci_range, mean_error, std_error)
+print('Accuracy Score :', bestScoreSVM)
+print('Report : ')
+print(classification_report(y_test, best_y_pred))
 
 
 # Training model using blurb, title, author and pages
-df.loc[:, 'title'] = df.loc[:, 'title'].apply(lambda x: clean_text(x))
-df['title'] = df['title'].apply(lambda x: remove_stopwords(x))
-df['title'] = df['title'].apply(lambda x: lematizing(x))
-df['title'] = df['title'].apply(lambda x: stemming(x))
-df.loc[:, 'author'] = df.loc[:, 'author'].apply(lambda x: clean_text(x))
-df['author'] = df['author'].apply(lambda x: remove_stopwords(x))
-df['author'] = df['author'].apply(lambda x: lematizing(x))
-df['author'] = df['author'].apply(lambda x: stemming(x))
+# df.loc[:, 'title'] = df.loc[:, 'title'].apply(lambda x: clean_text(x))
+# df['title'] = df['title'].apply(lambda x: remove_stopwords(x))
+# df['title'] = df['title'].apply(lambda x: lematizing(x))
+# df['title'] = df['title'].apply(lambda x: stemming(x))
+# df.loc[:, 'author'] = df.loc[:, 'author'].apply(lambda x: clean_text(x))
+# df['author'] = df['author'].apply(lambda x: remove_stopwords(x))
+# df['author'] = df['author'].apply(lambda x: lematizing(x))
+# df['author'] = df['author'].apply(lambda x: stemming(x))
 
 
-X1 = (df['blurb'])
-tfidf_X1 = tfidf.fit_transform(X1.values.astype('U'))
-X2 = (df['title'])
-tfidf_X2 = tfidf.fit_transform(X2.values.astype('U'))
-X3 = (df['author'])
-tfidf_X3 = tfidf.fit_transform(X3.values.astype('U'))
-X4 = (df['pages'])
-tfidf_X4 = tfidf.fit_transform(X3.values.astype('U'))
-X = np.column_stack((X1, X2))
-X = np.column_stack((X, X3))
-X = np.column_stack((X, X4))
-# Train test split of 80-20%
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=161)
-print(X_train)
+# X1 = (df['blurb'])
+# tfidf_X1 = tfidf.fit_transform(X1.values.astype('U'))
+# X2 = (df['title'])
+# tfidf_X2 = tfidf.fit_transform(X2.values.astype('U'))
+# X3 = (df['author'])
+# tfidf_X3 = tfidf.fit_transform(X3.values.astype('U'))
+# X4 = (df['pages'])
+# tfidf_X4 = tfidf.fit_transform(X3.values.astype('U'))
+# X = np.column_stack((X1, X2))
+# X = np.column_stack((X, X3))
+# X = np.column_stack((X, X4))
+# # Train test split of 80-20%
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X, y, test_size=0.2, random_state=161)
+# print(X_train)
 
 
-# train logistic model
-logistic.fit(X_train, y_train)
-# predict on test values
-y_pred_logistic = logistic.predict(X_test)
+# # train logistic model
+# logistic.fit(X_train, y_train)
+# # predict on test values
+# y_pred_logistic = logistic.predict(X_test)
 
-# Logistic with all features
-print('Accuracy score :', accuracy_score(y_test, y_pred_logistic))
-print('Report : ')
-print(classification_report(y_test, y_pred_logistic))
-print(len(y_pred_logistic))
+# # Logistic with all features
+# print('Accuracy score :', accuracy_score(y_test, y_pred_logistic))
+# print('Report : ')
+# print(classification_report(y_test, y_pred_logistic))
+# print(len(y_pred_logistic))
 
 # y_score = logistic.predict_proba(X_test)
 # fpr, tpr, _ = roc_curve(y_test, y_score[:,1], pos_label=1)
@@ -249,8 +288,8 @@ print(classification_report(y_test, y_pred_knn))
 # plt.show()
 
 # Svm with al features
-svc = svm.SVC(kernel='linear').fit(X_train, y_train)
-y_pred_svc = svc.predict(X_test)
-print('Accuracy Score :', accuracy_score(y_test, y_pred_svc))
-print('Report : ')
-print(classification_report(y_test, y_pred_svc))
+# svc = svm.SVC(kernel='linear').fit(X_train, y_train)
+# y_pred_svc = svc.predict(X_test)
+# print('Accuracy Score :', accuracy_score(y_test, y_pred_svc))
+# print('Report : ')
+# print(classification_report(y_test, y_pred_svc))
