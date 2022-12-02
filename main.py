@@ -55,8 +55,11 @@ for b in books:
         for g in b["genre"]:
             if g == n["genre"]:
                 b["genre"] = n["genre"]
-                cleanBooks.append(b)
+                if b["blurb"]:
+                    cleanBooks.append(b)
+                # cleanBooks.append(b)
                 break
+print(len(cleanBooks))
 
 # Write to json file
 jsonString = json.dumps(cleanBooks)
