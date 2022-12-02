@@ -21,6 +21,7 @@ import sys
 # jsonFile.close()
 # print(len(books))
 
+# Scraping data with (arg0 = start, arg1 = finish, arg2 = data file number)
 books = []
 jsonString = json.dumps(books)
 jsonFile = open("data" + sys.argv[3] + ".json", "w")
