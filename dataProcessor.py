@@ -20,6 +20,13 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.neighbors import KNeighborsClassifier
+import matplotlib.pyplot as plt
+from sklearn.model_selection import KFold
+from sklearn.metrics import f1_score
+from sklearn.metrics import roc_curve
+from sklearn.metrics import RocCurveDisplay
+from sklearn.metrics import auc
+
 nltk.download('stopwords')
 nltk.download('omw-1.4')
 nltk.download('wordnet')
@@ -197,11 +204,49 @@ print('Report : ')
 print(classification_report(y_test, y_pred_logistic))
 print(len(y_pred_logistic))
 
-# knn with all features
+# y_score = logistic.predict_proba(X_test)
+# fpr, tpr, _ = roc_curve(y_test, y_score[:,1], pos_label=1)
+# roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr).plot()
+# roc_auc = auc(fpr, tpr)
+# plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+# plt.legend(loc = 'lower right')
+# plt.plot([0, 1], [0, 1],'r--')
+# plt.title("ROC with Logistic Regression Classifier")
+# plt.show()
+
+# # knn with all features
+# k_range = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144]
+# mean_error = []; std_error = []
+# for k in k_range:
+#     model = KNeighborsClassifier(n_neighbors=k)
+#     temp=[]
+#     kf = KFold(n_splits=5)
+#     for train, test in kf.split(X):
+#         model.fit(X[train], y[train])
+#         ypred = model.predict(X[test])
+
+#         temp.append(f1_score(y[test],ypred,average='micro'))
+#     mean_error.append(np.array(temp).mean())
+#     std_error.append(np.array(temp).std())
+# plt.errorbar(k_range, mean_error, yerr = std_error)
+# plt.xlabel("k"); plt.ylabel("F1 Score")
+# plt.title(f"Cross-Validation with kNN")
+# plt.show()
+
 y_pred_knn = knn.predict(X_test)
 print('Accuracy Score :', accuracy_score(y_test, y_pred_knn))
 print('Report : ')
 print(classification_report(y_test, y_pred_knn))
+
+# y_score = knn.predict_proba(X_test)
+# fpr, tpr, _ = roc_curve(y_test, y_score[:,1], pos_label=1)
+# roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr).plot()
+# roc_auc = auc(fpr, tpr)
+# plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+# plt.legend(loc = 'lower right')
+# plt.plot([0, 1], [0, 1],'r--')
+# plt.title("ROC with Logistic Regression Classifier")
+# plt.show()
 
 # Svm with al features
 svc = svm.SVC(kernel='linear').fit(X_train, y_train)
