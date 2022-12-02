@@ -1,12 +1,5 @@
 # Genre Classifier
 
-- Gather Data from Github API
-  - Book Title
-  - Book blurb
-  - Pages Count 
-  - Published Date
-  - Genre
-
   - List of Genres 
 - Feature Engineer so we can put data in model
   - Text format for Title and blurb
@@ -15,3 +8,8 @@
   - Logistic Regression
 - Accuracy of Models/Results
 - Summary
+
+# Setup 
+
+pip install beautifulsoup4
+pip install requests
