@@ -4,12 +4,13 @@ import json
 import re
 import logging
 import sys
+import collections
 
 # Combining JSON
 # ---------------
-# data = open('data.json', encoding="utf8")
-# books = json.load(data)
-# data.close()
+data = open('data.json', encoding="utf8")
+books = json.load(data)
+data.close()
 # data = open('data9.json', encoding="utf8")
 # books_two = json.load(data)
 # for book in books_two:
@@ -22,11 +23,70 @@ import sys
 # print(len(books))
 
 # Scraping data with (arg0 = start, arg1 = finish, arg2 = data file number)
-books = []
-jsonString = json.dumps(books)
-jsonFile = open("data" + sys.argv[3] + ".json", "w")
+# books = []
+# jsonString = json.dumps(books)
+# jsonFile = open("data" + sys.argv[0] + ".json", "w")
+# jsonFile.write(jsonString)
+# jsonFile.close()
+
+genres = []
+for b in books:
+    for g in b["genre"]:
+        for x in genres:
+            if x["genre"] == g:
+                iCount = int(x["count"]) + 1
+                x["count"] = str(iCount)
+                break
+        else:
+            genres.append({"genre":g,"count":1})
+
+newlist = sorted(genres, key=lambda x: int(x["count"]), reverse=True)
+
+new_list = newlist[:10]
+
+new_list = sorted(new_list, key=lambda x: int(x["count"]), reverse=False)
+
+for n in new_list:
+    print(n["genre"] + " " + str(n["count"]))
+
+cleanBooks = []
+for b in books:
+    for n in new_list:
+        for g in b["genre"]:
+            if g == n["genre"]:
+                b["genre"] = n["genre"]
+                cleanBooks.append(b)
+                break
+
+# Write to json file
+jsonString = json.dumps(cleanBooks)
+jsonFile = open("genreData.json", "w")
 jsonFile.write(jsonString)
 jsonFile.close()
+
+## Check Genre Distribution
+# genres = []
+# for b in cleanBooks:
+#     for x in genres:
+#         if x["genre"] == b["genre"]:
+#             iCount = int(x["count"]) + 1
+#             x["count"] = str(iCount)
+#             break
+#     else:
+#         genres.append({"genre": b["genre"],"count":1})
+
+# newlist = sorted(genres, key=lambda x: int(x["count"]), reverse=True)
+
+# new_list = newlist[:10]
+
+# count = 0
+# print("UPDATED GENRE", len(books))
+# for n in new_list:
+#     print(n["genre"] + " " + str(n["count"]))
+#     count += int(n["count"])
+
+# print(len(cleanBooks), count)
+
 
 start = int(sys.argv[1])
 finish = int(sys.argv[2])
