@@ -1,0 +1,47 @@
+import numpy as np
+import pandas as pd
+import torch
+import transformers as ppb  # pytorch transformers
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
+
+
+# load data
+df = pd.read_json("genreData.json")
+# isolate genres array
+temp = df.get("genre")
+genres = []
+for i in range(0, len(temp), 1):  # for(i = 0; i < len(temp); i++)
+    # get first genre and add to ne genre array
+    if (len(temp[i]) != 0):
+        genres.append(temp[i][0])
+    # set points with no genres data to noGenre
+    else:
+        genres.append("NoGenre")
+
+allGenres = df.get("genre")
+
+# get all unique genres
+uniqueGenres = df.genre.unique()
+print(len(uniqueGenres))
+
+# assign unique genres number
+genreDict = {}
+index = 0
+for i in range(0, len(uniqueGenres), 1):
+    genreDict[uniqueGenres[i]] = i
+
+genreNumbers = [None] * len(allGenres)
+print(allGenres)
+for i in range(0, len(allGenres), 1):
+    result_vector = np.zeros(len(uniqueGenres))
+    result_vector[genreDict[allGenres[i]]] = 1
+    genreNumbers[i] = result_vector
+
+
+df['GenreNumber'] = genreNumbers
+print(df.head(5))
+
+model_class, tokenizer_class, pretrained_weights = (
+    ppb.DistilBertModel, ppb.DistilBertTokenizer, 'distilbert-base-uncased')

@@ -13,14 +13,16 @@ from nltk.stem import PorterStemmer
 from sklearn.preprocessing import LabelEncoder
 import re
 from bertopic import BERTopic
+from umap import UMAP
 from sklearn import svm
 from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.neighbors import KNeighborsClassifier
-
+nltk.download('stopwords')
 nltk.download('omw-1.4')
+nltk.download('wordnet')
 # load data
 df = pd.read_json("genreData.json")
 print(df.columns)
@@ -65,7 +67,7 @@ def clean_text(text):
 df.loc[:, 'blurb'] = df.loc[:, 'blurb'].apply(lambda x: clean_text(x))
 
 # Removing stopwords from the column summary.
-nltk.download('stopwords')
+
 stop_words = set(stopwords.words('english'))
 
 # this removes stopwords
@@ -79,7 +81,7 @@ def remove_stopwords(text):
 df['blurb'] = df['blurb'].apply(lambda x: remove_stopwords(x))
 
 # Perfrom lemmatisation on summary
-nltk.download('wordnet')
+
 
 lemma = WordNetLemmatizer()
 
@@ -134,23 +136,76 @@ logistic.fit(tfidf_X_train, y_train)
 # predict on test values
 y_pred_logistic = logistic.predict(tfidf_X_test)
 
+# print('Accuracy score :', accuracy_score(y_test, y_pred_logistic))
+# print('Report : ')
+# print(classification_report(y_test, y_pred_logistic))
+# # print(len(y_pred_logistic))
+
+# # KNN
+knn = KNeighborsClassifier(n_neighbors=65)
+# knn.fit(tfidf_X_train, y_train)
+
+# y_pred_knn = knn.predict(tfidf_X_test)
+# print('Accuracy Score :', accuracy_score(y_test, y_pred_knn))
+# print('Report : ')
+# print(classification_report(y_test, y_pred_knn))
+
+# # SVM Linear classifer
+# svc = svm.SVC(kernel='linear').fit(tfidf_X_train, y_train)
+# y_pred_svc = svc.predict(tfidf_X_test)
+# print('Accuracy Score :', accuracy_score(y_test, y_pred_svc))
+# print('Report : ')
+# print(classification_report(y_test, y_pred_svc))
+
+
+# Training model using blurb, title, author and pages
+df.loc[:, 'title'] = df.loc[:, 'title'].apply(lambda x: clean_text(x))
+df['title'] = df['title'].apply(lambda x: remove_stopwords(x))
+df['title'] = df['title'].apply(lambda x: lematizing(x))
+df['title'] = df['title'].apply(lambda x: stemming(x))
+df.loc[:, 'author'] = df.loc[:, 'author'].apply(lambda x: clean_text(x))
+df['author'] = df['author'].apply(lambda x: remove_stopwords(x))
+df['author'] = df['author'].apply(lambda x: lematizing(x))
+df['author'] = df['author'].apply(lambda x: stemming(x))
+
+
+X1 = (df['blurb'])
+tfidf_X1 = tfidf.fit_transform(X1.values.astype('U'))
+X2 = (df['title'])
+tfidf_X2 = tfidf.fit_transform(X2.values.astype('U'))
+X3 = (df['author'])
+tfidf_X3 = tfidf.fit_transform(X3.values.astype('U'))
+X4 = (df['pages'])
+tfidf_X4 = tfidf.fit_transform(X3.values.astype('U'))
+X = np.column_stack((X1, X2))
+X = np.column_stack((X, X3))
+X = np.column_stack((X, X4))
+# Train test split of 80-20%
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=161)
+print(X_train)
+
+
+# train logistic model
+logistic.fit(X_train, y_train)
+# predict on test values
+y_pred_logistic = logistic.predict(X_test)
+
+# Logistic with all features
 print('Accuracy score :', accuracy_score(y_test, y_pred_logistic))
 print('Report : ')
 print(classification_report(y_test, y_pred_logistic))
 print(len(y_pred_logistic))
 
-# KNN
-knn = KNeighborsClassifier(n_neighbors=65)
-knn.fit(tfidf_X_train, y_train)
-
-y_pred_knn = knn.predict(tfidf_X_test)
+# knn with all features
+y_pred_knn = knn.predict(X_test)
 print('Accuracy Score :', accuracy_score(y_test, y_pred_knn))
 print('Report : ')
 print(classification_report(y_test, y_pred_knn))
 
-# SVM Linear classifer
-svc = svm.SVC(kernel='linear').fit(tfidf_X_train, y_train)
-y_pred_svc = svc.predict(tfidf_X_test)
+# Svm with al features
+svc = svm.SVC(kernel='linear').fit(X_train, y_train)
+y_pred_svc = svc.predict(X_test)
 print('Accuracy Score :', accuracy_score(y_test, y_pred_svc))
 print('Report : ')
 print(classification_report(y_test, y_pred_svc))
